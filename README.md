@@ -1,10 +1,10 @@
-## Welcome to My Portfolio!
+## Welcome to Vikram's Portfolio!
 
-Welcome to my portfolio! Here, I aim to showcase my skills in both Manual and Automation QA. This repository serves as a platform to share my knowledge, demonstrate best practices, and continuously refine my skills over time.
+Here, Vikram showcase the expertise in both Manual and Automation Test Engineer. This repository serves as a platform to share my knowledge, demonstrate best practices, and continuously refine my skills over time.
 
 I also hope this repository will act as a valuable resource for those interested in becoming QA Engineers, providing insights and practical examples to aid in their learning journey. Additionally, it serves as a foundation for establishing a QA department, should the opportunity arise.
 
-Thank you for visiting, and I hope you find this portfolio informative and helpful.
+Thank you for visiting the profile, and I hope you find this portfolio informative and helpful.
 
 ### Tools
 
