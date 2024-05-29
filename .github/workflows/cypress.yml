@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        spec-file: [login.feature]
+        spec-file: [login.feature, product.feature]
 
     steps:
       - name: Checkout code

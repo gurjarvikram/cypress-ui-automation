@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         browser: [chrome, firefox, electron]
-        spec-file: [login.feature]
+        spec-file: [login.feature, product.feature]
 
     steps:
       - name: Checkout code

@@ -71,7 +71,10 @@ From clone to installation/configuration:
    - Feature Files: Contain the test scenarios using the Gherkin language with Given, When, And, Then keywords.
 3. Step Definitions
 4. POM (Page Object Model)
-5. Cypress Cloud
+5. GitHub Actions CI/CD
+    - Parallel Execution Across Browsers
+        The cypress-browsers.yml workflow runs Cypress tests in parallel across different browsers (Chrome, Firefox, and Electron).
+6. Cypress Cloud
 
 ### How to Run & Record Cypress Scripts into Cypress Cloud
 
