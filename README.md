@@ -37,7 +37,7 @@ Visual Studio Code is a lightweight yet powerful source code editor. It is widel
 #### What is Cypress?
 Cypress is a powerful, next-generation front-end testing tool built for modern web applications. It enables developers to write tests in JavaScript, providing comprehensive end-to-end testing, integration testing, regression, and unit testing capabilities.
 
-Cypress consists of a free, [open-source](https://github.com/cypress-io/cypress) testing tool and [Cypress Cloud](https://docs.cypress.io/guides/cloud/introduction) for recording your tests.
+This enables you to write faster, easier and more reliable tests.
 
 #### Key Features
 Cypress offers several key features, including:
