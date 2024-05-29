@@ -23,7 +23,7 @@ const createEsbuildPlugin =
       screenshotOnRunFailure=true;	    
       return config;
     },
-    projectId: '',
+    projectId: 'y4sbzo',
     specPattern: 'cypress/e2e/*/*.feature',
     viewportWidth: 1880,
     viewportHeight: 882,   
