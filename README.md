@@ -1,10 +1,10 @@
-## Welcome to My Portfolio!
+## Welcome to Vikram's QA Engineering Portfolio!
 
-Welcome to my portfolio! Here, I aim to showcase my skills in both Manual and Automation QA. This repository serves as a platform to share my knowledge, demonstrate best practices, and continuously refine my skills over time.
+This repository showcases expertise in both Manual and Automation Test Engineering. It serves as a platform to share knowledge, demonstrate best practices, and continuously refine skills.
 
-I also hope this repository will act as a valuable resource for those interested in becoming QA Engineers, providing insights and practical examples to aid in their learning journey. Additionally, it serves as a foundation for establishing a QA department, should the opportunity arise.
+The aim is for this repository to become a valuable resource for aspiring QA Engineers, offering insights and practical examples to support their learning journey. Additionally, it can serve as a foundation for establishing a QA department when the opportunity arises.
 
-Thank you for visiting, and I hope you find this portfolio informative and helpful.
+Thank you for visiting this profile. Hopefully, this portfolio will be informative and helpful!
 
 ### Tools
 
@@ -37,7 +37,7 @@ Visual Studio Code is a lightweight yet powerful source code editor. It is widel
 #### What is Cypress?
 Cypress is a powerful, next-generation front-end testing tool built for modern web applications. It enables developers to write tests in JavaScript, providing comprehensive end-to-end testing, integration testing, regression, and unit testing capabilities.
 
-Cypress consists of a free, [open-source](https://github.com/cypress-io/cypress) testing tool and [Cypress Cloud](https://docs.cypress.io/guides/cloud/introduction) for recording your tests.
+This enables you to write faster, easier and more reliable tests.
 
 #### Key Features
 Cypress offers several key features, including:
@@ -100,3 +100,5 @@ From clone to installation/configuration:
 ```sh
 npx cypress run --spec <relative path of the feature file> --record --key <record key>
 ```
+### License
+The Cypress io framework is a free, [open-source](https://github.com/cypress-io/cypress) software licensed under the [MIT license](https://opensource.org/license/MIT).
