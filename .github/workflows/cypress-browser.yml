@@ -1,0 +1,28 @@
+name: Cypress Parallel Browser Tests
+
+on: [push, pull_request]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser: [chrome, firefox, electron]
+        spec-file: [login.feature]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Specify the Node.js version you need
+
+      - name: Install cypress
+        run: npm install cypress --save -dev
+
+      - name: Run Cypress tests on ${{ matrix.browser }}
+        run: |
+          npx cypress run --browser ${{ matrix.browser }} --spec "cypress/e2e/ui-tests${{ matrix.spec-file }}"
