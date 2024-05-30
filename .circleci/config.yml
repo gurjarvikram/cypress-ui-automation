@@ -35,7 +35,7 @@ jobs:
           command: npm install cypress --save-dev
       - run:
           name: Run Cypress tests
-          command: npx cypress run --spec "cypress/e2e/ui-tests/login.feature"
+          command: npx cypress run
       - store_artifacts:
           path: cypress/screenshots
           destination: cypress/screenshots
