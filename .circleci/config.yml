@@ -1,0 +1,52 @@
+version: 2.1
+
+executors:
+  machine-executor:
+    machine:
+      image: ubuntu-2004:202101-01
+
+jobs:
+  install:
+    executor: machine-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+  run-cypress-tests:
+    executor: machine-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Verify dependencies
+          command: npm ci
+      - run:
+          name: Run Cypress tests
+          command: npx cypress run
+      - store_artifacts:
+          path: cypress/screenshots
+          destination: cypress/screenshots
+      - store_test_results:
+          path: cypress/results
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - install
+      - run-cypress-tests:
+          requires:
+            - install
