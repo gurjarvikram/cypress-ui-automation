@@ -31,8 +31,8 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies-
       - run:
-          name: Install Cypress dependencies
-          command: npm install cypress --save-dev
+          name: Verify dependencies
+          command: npm ci
       - run:
           name: Run Cypress tests
           command: npx cypress run
@@ -50,4 +50,3 @@ workflows:
       - run-cypress-tests:
           requires:
             - install
-
