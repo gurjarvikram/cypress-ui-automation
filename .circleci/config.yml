@@ -29,7 +29,7 @@ jobs:
 
       - run:
           name: Run Cypress tests
-          command: npx cypress run
+          command: npm cypress run
       - store_artifacts:
           path: cypress/screenshots
           destination: cypress/screenshots
