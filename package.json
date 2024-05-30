@@ -9,9 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cypress-downloadfile": "^1.2.3",
-    "cypress-file-upload": "^5.0.8",
-    "cypress-plugin-api": "^2.11.1"
+    "cypress-file-upload": "^5.0.8"
   },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^16.0.3",
