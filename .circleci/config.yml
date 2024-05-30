@@ -24,9 +24,6 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies-
       - run:
-          name: Verify dependencies
-          command: npm ci
-      - run:
           name: Run Cypress tests
           command: npx cypress run
       - store_artifacts:
