@@ -1,46 +1,417 @@
+# This code is licensed from CircleCI to the user under the MIT license.
+# See here for details: https://circleci.com/developer/orbs/licensing
 version: 2.1
-
+description: |
+    Run your Cypress.io end-to-end & component tests without spending time configuring CircleCI
+display:
+    home_url: https://cypress.io
+    source_url: https://github.com/cypress-io/circleci-orb
+orbs:
+    browser-tools: circleci/browser-tools@1.4.8
+    node: circleci/node@5
+commands:
+    install:
+        description: |
+            Installs your application's node modules and cypress dependencies
+        parameters:
+            cypress-cache-key:
+                default: cypress-cache-{{ arch }}-{{ checksum "package.json" }}
+                description: Cache key used to cache the Cypress binary.
+                type: string
+            cypress-cache-path:
+                default: ~/.cache/Cypress
+                description: |
+                    By default, this will cache the '~/.cache/Cypress' directory so that the Cypress binary is cached. You can override this by providing your own cache path.
+                type: string
+            include-branch-in-node-cache-key:
+                default: false
+                description: |
+                    If true, this cache will only apply to runs within the same branch. (Adds -{{ .Branch }}- to the node cache key)
+                type: boolean
+            install-browsers:
+                default: false
+                description: |
+                    Cypress runs by default in the Electron browser. Use this flag to install additional browsers to run your tests in.
+                    This is only needed if you are passing the `--browser` flag in your `cypress-command`.
+                    This parameter leverages the `circleci/browser-tools` orb and includes Chrome and FireFox.
+                    If you need additional browser support you can set this to false and use an executor with a docker image
+                    that includes the browsers of your choosing. See https://hub.docker.com/r/cypress/browsers/tags
+                type: boolean
+            install-command:
+                default: ""
+                description: Overrides the default NPM command (npm ci)
+                type: string
+            node-cache-version:
+                default: v1
+                description: Change the default node cache version if you need to clear the cache for any reason.
+                type: string
+            package-manager:
+                default: npm
+                description: Select the default node package manager to use. NPM v5+ Required.
+                enum:
+                    - npm
+                    - yarn
+                    - yarn-berry
+                    - pnpm
+                type: enum
+            post-install:
+                default: ""
+                description: |
+                    Additional commands to run after running install but before verifying Cypress and saving cache.
+                type: string
+            working-directory:
+                default: ""
+                description: Directory containing package.json
+                type: string
+        steps:
+            - checkout
+            - when:
+                condition: << parameters.install-browsers >>
+                steps:
+                    - browser-tools/install-browser-tools
+            - restore_cache:
+                key: << parameters.cypress-cache-key >>
+                name: Restore Cypress cache
+            - node/install-packages:
+                app-dir: << parameters.working-directory >>
+                cache-version: << parameters.node-cache-version >>
+                include-branch-in-cache-key: << parameters.include-branch-in-node-cache-key >>
+                override-ci-command: << parameters.install-command >>
+                pkg-manager: << parameters.package-manager >>
+            - when:
+                condition: << parameters.post-install >>
+                steps:
+                    - run:
+                        command: << parameters.post-install >>
+                        name: Post Install Script
+                        working_directory: << parameters.working-directory >>
+            - run:
+                command: npx cypress verify
+                name: Verify Cypress
+                working_directory: << parameters.working-directory >>
+            - save_cache:
+                key: << parameters.cypress-cache-key >>
+                name: Save Cypress Binary
+                paths:
+                    - << parameters.cypress-cache-path >>
+    run-tests:
+        description: |
+            A single, complete job to run Cypress tests
+        parameters:
+            cypress-command:
+                default: npx cypress run
+                description: Command used to run your Cypress tests
+                type: string
+            start-command:
+                default: ""
+                description: Command used to start your local dev server for Cypress to tests against
+                type: string
+            working-directory:
+                default: .
+                description: Directory containing package.json
+                type: string
+        steps:
+            - when:
+                condition: << parameters.start-command >>
+                steps:
+                    - run:
+                        background: true
+                        command: << parameters.start-command >>
+                        name: Start Server
+                        working_directory: << parameters.working-directory >>
+            - run:
+                command: << parameters.cypress-command >>
+                name: Run Cypress
+                working_directory: << parameters.working-directory >>
+            - store_artifacts:
+                path: << parameters.working-directory >>/cypress/videos
+            - store_artifacts:
+                path: << parameters.working-directory >>/cypress/screenshots
 executors:
-  machine-executor:
-    machine:
-      image: ubuntu-2004:202101-01
-
+    default:
+        description: |
+            Single Docker container used to run Cypress Tests
+        docker:
+            - image: cimg/node:<< parameters.node-version >>-browsers
+        parameters:
+            node-version:
+                default: 18.16.1
+                description: |
+                    The version of Node to run your tests with.
+                type: string
 jobs:
-  install:
-    executor: machine-executor
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
+    run:
+        description: |
+            A single, complete job to run Cypress end-to-end tests in your application.
+        executor: default
+        parallelism: << parameters.parallelism >>
+        parameters:
+            cypress-cache-key:
+                default: cypress-cache-{{ arch }}-{{ checksum "package.json" }}
+                description: Cache key used to cache the Cypress binary.
+                type: string
+            cypress-cache-path:
+                default: ~/.cache/Cypress
+                description: |
+                    By default, this will cache the '~/.cache/Cypress' directory so that the Cypress binary is cached. You can override this by providing your own cache path.
+                type: string
+            cypress-command:
+                default: npx cypress run
+                description: Command used to run your Cypress tests
+                type: string
+            include-branch-in-node-cache-key:
+                default: false
+                description: |
+                    If true, this cache will only apply to runs within the same branch. (Adds -{{ .Branch }}- to the node cache key)
+                type: boolean
+            install-browsers:
+                default: false
+                description: |
+                    Cypress runs by default in the Electron browser. Use this flag to install additional browsers to run your tests in.
+                    This is only needed if you are passing the `--browser` flag in your `cypress-command`.
+                    This parameter leverages the `circleci/browser-tools` orb and includes Chrome and FireFox.
+                    If you need additional browser support you can set this to false and use an executor with a docker image
+                    that includes the browsers of your choosing. See https://hub.docker.com/r/cypress/browsers/tags
+                type: boolean
+            install-command:
+                default: ""
+                description: Overrides the default NPM command (npm ci)
+                type: string
+            node-cache-version:
+                default: v1
+                description: Change the default node cache version if you need to clear the cache for any reason.
+                type: string
+            package-manager:
+                default: npm
+                description: Select the default node package manager to use. NPM v5+ Required.
+                enum:
+                    - npm
+                    - yarn
+                    - yarn-berry
+                    - pnpm
+                type: enum
+            parallelism:
+                default: 1
+                description: |
+                    Number of Circle machines to use for load balancing, min 1
+                    (requires `parallel` and `record` flags in your `cypress-command`)
+                type: integer
+            post-install:
+                default: ""
+                description: |
+                    Additional commands to run after running install but before verifying Cypress and saving cache.
+                type: string
+            start-command:
+                default: ""
+                description: Command used to start your local dev server for Cypress to tests against
+                type: string
+            working-directory:
+                default: ""
+                description: Directory containing package.json
+                type: string
+        steps:
+            - install:
+                cypress-cache-key: << parameters.cypress-cache-key >>
+                cypress-cache-path: << parameters.cypress-cache-path >>
+                include-branch-in-node-cache-key: << parameters.include-branch-in-node-cache-key >>
+                install-browsers: << parameters.install-browsers >>
+                install-command: << parameters.install-command >>
+                node-cache-version: << parameters.node-cache-version >>
+                package-manager: << parameters.package-manager >>
+                post-install: << parameters.post-install >>
+                working-directory: << parameters.working-directory >>
+            - run-tests:
+                cypress-command: << parameters.cypress-command >>
+                start-command: << parameters.start-command >>
+                working-directory: << parameters.working-directory >>
+examples:
+    browser:
+        description: |
+            Run Cypress tests using specified browser. The CircleCI Browser Tools orb at https://circleci.com/developer/orbs/orb/circleci/browser-tools#commands-install-browser-tools currently supports Chrome & Firefox. See https://circleci.com/developer/orbs/orb/cypress-io/cypress#usage-edge, for Microsoft Edge support.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-command: npx cypress run --browser chrome
+                            install-browsers: true
+                            start-command: npm run start:dev
+    caching:
+        description: |
+            Runs Cypress tests and and invalidate the current cache
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-cache-key: custom-cypress-cache-v1-{{ arch }}-{{ checksum "package.json" }}
+                            cypress-cache-path: ~/.cache/custom-dir/Cypress
+                            cypress-command: npx cypress run --component
+                            node-cache-version: v2
+    commands:
+        description: |
+            Runs Cypress tests in your own job using commands
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            jobs:
+                install-and-persist:
+                    executor: cypress/default
+                    steps:
+                        - cypress/install
+                        - persist_to_workspace:
+                            paths:
+                                - .cache/Cypress
+                                - project
+                            root: ~/
+                run-tests-in-parallel:
+                    executor: cypress/default
+                    parallelism: 2
+                    steps:
+                        - attach_workspace:
+                            at: ~/
+                        - cypress/run-tests:
+                            cypress-command: npx cypress run --component --parallel --record
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - install-and-persist:
+                            name: Install & Persist To Workspace
+                        - run-tests-in-parallel:
+                            name: Run Tests in Parallel
+                            requires:
+                                - Install & Persist To Workspace
+    component:
+        description: |
+            Runs Cypress component tests. Installs dependencies and caches NPM modules and the Cypress binary.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-command: npx cypress run --component
+    custom-install:
+        description: |
+            Runs Cypress tests and install dependencies using a custom install and post-install script.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            install-command: npm install && echo hello
+                            post-install: npm run build
+    edge:
+        description: |
+            Run Cypress tests in Microsoft Edge.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-command: npx cypress run --browser edge
+                            start-command: npm run start:dev
+    mono-repo:
+        description: |
+            Runs Cypress tests in a monorepo or when your Cypress folder is somewhere other than the root directory.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-cache-key: cypress-cache-{{ arch }}-{{ checksum "libs/shared-ui/package.json" }}
+                            cypress-command: npx cypress run --component
+                            working-directory: libs/shared-ui
+    node-version:
+        description: |
+            Run Cypress tests using the cypress/default executor with a specified node version.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows: null
+    pnpm:
+        description: |
+            Runs Cypress tests using pnpm. Installs dependencies and caches NPM modules and the Cypress binary.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            install-command: pnpm install --frozen-lockfile
+                            package-manager: pnpm
+                            start-command: pnpm start
+    recording:
+        description: |
+            Runs Cypress end-to-end tests in parallel and record results to Cypress Cloud. Installs dependencies and caches NPM modules and the Cypress binary.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-command: npx cypress run --parallel --record
+                            parallelism: 3
+                            start-command: npm run start
+    run:
+        description: |
+            Runs Cypress end-to-end tests without recording results to Cypress Cloud. Installs dependencies and caches NPM modules and the Cypress binary.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            start-command: npm run start
+    wait-on:
+        description: |
+            Runs Cypress tests after waiting for the local server to start using the wait-on package (https://github.com/jeffbski/wait-on).
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            cypress-command: npx wait-on@latest http://localhost:8080 && npx cypress run
+                            start-command: npm start
+    yarn:
+        description: |
+            Runs Cypress tests using yarn. Installs dependencies and caches NPM modules and the Cypress binary.
+        usage:
+            version: "2.1"
+            orbs:
+                cypress: cypress-io/cypress@3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - cypress/run:
+                            package-manager: yarn
+                            start-command: yarn start
 
-  run-cypress-tests:
-    executor: machine-executor
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-      - run:
-          name: Cypress install
-          command: npm install cypress --save-dev
-
-      - run:
-          name: Run Cypress tests
-          command: npm cypress run
-      - store_artifacts:
-          path: cypress/screenshots
-          destination: cypress/screenshots
-      - store_test_results:
-          path: cypress/results
-
-workflows:
-  version: 2
-  test:
-    jobs:
-      - install
-      - run-cypress-tests:
-          requires:
-            - install
