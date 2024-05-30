@@ -71,7 +71,7 @@ From clone to installation/configuration:
    - Feature Files: Contain the test scenarios using the Gherkin language with Given, When, And, Then keywords.
 3. Step Definitions
 4. POM (Page Object Model)
-5. GitHub Actions CI/CD:
+5. CI/CD with GitHub Actions:
    - Parallel Execution Across Browsers: The cypress-browsers.yml workflow runs Cypress tests in parallel across different browsers (Chrome, Firefox, and Electron).
 
 ```bash
@@ -106,7 +106,32 @@ jobs:
           npx cypress run --browser ${{ matrix.browser }} --spec "cypress/integration/${{ matrix.spec_file }}"
 ```
   
-            
+6. CI/CD with Circle CI:
+
+```bash
+
+version: 2.1
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-2004:202201-01
+    steps:
+      - checkout
+    
+      - run:
+          name: Install dependencies
+          command: npm install
+          
+      - run:
+          name: Cypress install
+          command: npx cypress install
+          
+      - run:
+          name: Run tests
+          command: npx cypress run
+```
+
 7. Cypress Cloud
 
 ### How to Run & Record Cypress Scripts into Cypress Cloud
