@@ -24,6 +24,10 @@ jobs:
             - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies-
       - run:
+          name: Cypress install
+          command: npm install cypress --save-dev
+
+      - run:
           name: Run Cypress tests
           command: npx cypress run
       - store_artifacts:
