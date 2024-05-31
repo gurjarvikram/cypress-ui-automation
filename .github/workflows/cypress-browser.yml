@@ -1,4 +1,4 @@
-name: Cypress Parallel Browser Tests
+name: Cypress Cross Browser Tests
 
 on: [push, pull_request]
 
