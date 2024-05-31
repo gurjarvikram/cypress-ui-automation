@@ -1,19 +1,14 @@
-name: Cypress Parallel Tests
+name: Cypress Tests
 
 on: [push, pull_request]
 
 jobs:
   cypress-run:
-    runs-on: ubuntu-latest  # Replace with runner type if needed (e.g., self-hosted runner)
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         spec-file: [login.feature, product.feature]
-      container:  # Add this line
-        # This defines the number of machines (containers) for parallel execution
-        # Adjust the value based on your needs and available resources
-        # (e.g., containers: [1, 2, 3])
-        containers: [1, 2]  # Example: Run tests in parallel on 2 machines
 
     steps:
       - name: Checkout code
@@ -24,11 +19,9 @@ jobs:
         with:
           node-version: '20' # Specify the Node.js version you need
       
-      - name: Install Cypress  # Consider pre-installing in package.json (optional)
-        run: npm install cypress --save-dev
+      - name: Install cypress
+        run: npm install cypress --save -dev
 
       - name: Run Cypress tests
-        run: npx cypress run -parallel -t 3 -d "cypress/e2e/ui-tests/${{ matrix.env.SPEC_FILE }}"
-        env:
-          SPEC_FILE: ${{ matrix.spec-file }}  # Use matrix variable directly 
+        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
 
