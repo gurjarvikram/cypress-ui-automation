@@ -22,5 +22,5 @@ jobs:
       - name: Install Cypress
         run: npm install cypress --save-dev
 
-      - name: Run Cypress tests
-        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}" --parallel --record --key "bf0342c7-9e0d-464e-b0ea-39058e3f7c8d"
+      - name: Run Cypress tests      
+        run: npx cypress -parallel -s cypress:run -t 3 -d "cypress/e2e/ui-tests/${{ matrix.spec-file }}"

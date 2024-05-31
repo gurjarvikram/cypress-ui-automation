@@ -8,15 +8,16 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "cypress-file-upload": "^5.0.8"
-  },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^16.0.3",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "@faker-js/faker": "^7.6.0",
-    "cypress": "^13.10.0",
+    "cypress": "^12.17.4",
+    "cypress-file-upload": "^5.0.8",
     "esbuild": "^0.17.17",
     "fs": "^0.0.1-security"
+  },
+  "dependencies": {
+    "cypress-parallel": "^0.14.0"
   }
 }
