@@ -131,8 +131,9 @@ jobs:
           name: Run tests
           command: npx cypress run
 ```
-
-7. Cypress Cloud
+          
+7. Cypress Cloud:
+    - We can see the recorded tests for this project at the [Cypress Cloud](https://cloud.cypress.io/organizations/9698d65f-c3dd-49fd-87f6-c1db1218f678/projects) link.
 
 ### How to Run & Record Cypress Scripts into Cypress Cloud
 
