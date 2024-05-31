@@ -19,8 +19,13 @@ jobs:
         with:
           node-version: '20' # Specify the Node.js version you need
       
-      - name: Install cypress
-        run: npm install cypress --save -dev
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Cypress
+        run: npm install cypress --save-dev
 
       - name: Run Cypress tests
-        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}" --parallel --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}" --parallel --record --key $CYPRESS_RECORD_KEY
