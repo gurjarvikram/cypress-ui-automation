@@ -19,7 +19,6 @@ jobs:
         with:
           node-version: '20' # Specify the Node.js version you need
       
-
       - name: Install Cypress
         run: npm install cypress --save-dev
 
