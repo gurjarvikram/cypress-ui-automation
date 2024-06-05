@@ -1,5 +1,9 @@
+import { faker } from '@faker-js/faker';
+// Generate random details using faker
+const firstName = faker.name.firstName();
+const lastName = faker.name.lastName();
+const postalCode = faker.address.zipCode();
 
-const USERNAME_INPUT = "#user-name"
 
 class productPage {
 
@@ -20,7 +24,6 @@ class productPage {
     }
     static z_To_a() {
         cy.get(".product_sort_container").select('Name (Z to A)')
-
     }
     static result_sorting() {
         // Descending order assertion
@@ -36,6 +39,143 @@ class productPage {
                 expect(texts).to.deep.equal(sortedTexts);
             });
     }
+    static add_cart_btn() {
+        cy.get('.title')
+            .should('contain', 'Products')
+        cy.get("#add-to-cart-sauce-labs-backpack").click()
+    }
+    static shopping_cart_badge() {
+        cy.get(".shopping_cart_badge").click()
+        cy.url()
+            .should('include', 'cart.html')
+    }
+    static your_cart_details() {
+        // Ensure the title 'Your Cart' is displayed
+        cy.get('.title')
+            .should('contain', 'Your Cart')
+
+        // Ensure the quantity label is displayed
+        cy.get('.cart_quantity_label')
+            .should('contain', 'QTY')
+
+        // Ensure the description label is displayed
+        cy.get('.cart_desc_label')
+            .should('contain', 'Description')
+
+        // Ensure the remove button is displayed
+        cy.get('#remove-sauce-labs-backpack')
+            .should('contain', 'Remove')
+
+        // Ensure the Continue Shopping button is displayed
+        cy.get('#continue-shopping')
+            .should('contain', 'Continue Shopping')
+
+        // Ensure the Checkout button is displayed
+        cy.get('#checkout')
+            .should('contain', 'Checkout')
+
+        // Ensure the product is displayed in the cart
+        cy.get('.inventory_item_name')
+            .should('be.visible')
+    }
+    static remove_product_cart() {
+        // Click the remove button for the product
+        cy.get('#remove-sauce-labs-backpack').click()
+
+        // Ensure the product is removed from the cart
+        cy.get('.inventory_item_name')
+            .should('not.exist')
+    }
+    static empty_cart() {
+        // Ensure the product is removed from the cart
+        cy.get('.inventory_item_name')
+            .should('not.exist')
+
+        // Ensure the cart badge is empty
+        cy.get('.shopping_cart_badge')
+            .should('not.exist')
+    }
+    static checkout_btn() {
+        // Click on the checkout button from the cart
+        cy.get("#checkout").click()
+    }
+    static navigate_To_checkout() {
+        // Ensure the navigate to the checkout page
+        cy.url().should('include', 'checkout-step-one.html')
+
+        // Ensure the title 'Checkout: Your Information' is displayed
+        cy.get('.title')
+            .should('contain', 'Checkout: Your Information')
+    }
+    static fill_customer_details() {
+        cy.get('#first-name').type(firstName)
+        cy.get('#last-name').type(lastName)
+        cy.get('#postal-code').type(postalCode)
+
+    }
+    static continue_btn() {
+        cy.get('#continue').click()
+
+        // Ensure the URL includes 'checkout-step-two.html'
+        cy.url()
+            .should('include', 'checkout-step-two.html')
+    }
+    static order_overview() {
+        // Ensure the title 'Checkout: Overview' is displayed
+        cy.get('.title')
+            .should('contain', 'Checkout: Overview')
+
+        // Ensure the quantity label is displayed
+        cy.get('.cart_quantity_label')
+            .should('contain', 'QTY')
+
+        // Ensure the description label is displayed
+        cy.get('.cart_desc_label')
+            .should('contain', 'Description')
+
+        // Ensure the product is displayed in the cart
+        cy.get('.inventory_item_name')
+            .should('be.visible')
+
+        // Ensure the payment info is displayed in the cart
+        cy.get("div[data-test='payment-info-label']")
+            .should('contain', 'Payment Information')
+
+        // Ensure the Shipping Information is displayed in the cart
+        cy.get("div[data-test='shipping-info-label']")
+            .should('contain', 'Shipping Information')
+
+        // Ensure the Price Total is displayed in the cart
+        cy.get("div[data-test='total-info-label']")
+            .should('contain', 'Price Total')
+
+        // Ensure the Cancel button is displayed
+        cy.get('#cancel')
+            .should('contain', 'Cancel')
+    }
+    static finish_btn() {
+        // Click the finish button for the product
+        cy.get('#finish').click()
+    }
+    static complete_order() {
+        // Ensure the URL includes 'checkout-complete.html'
+        cy.url()
+            .should('include', 'checkout-complete.html')
+
+        // Ensure the order confirmation message is displayed correctly
+        cy.contains('Thank you for your order!')
+            .should('have.text', 'Thank you for your order!')
+
+        // Ensure the title 'Checkout: Complete!' is displayed
+        cy.get('.title')
+            .should('contain', 'Checkout: Complete!')
+
+        // Ensure the 'Back Home' button is displayed
+        cy.contains('button', 'Back Home')
+            .should('be.visible')
+
+    }
+
 
 }
 
