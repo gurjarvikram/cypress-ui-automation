@@ -6,28 +6,28 @@ The aim is for this repository to become a valuable resource for aspiring QA Eng
 
 Thank you for visiting this profile. Hopefully, this portfolio will be informative and helpful!
 
-### Tools
+### Testing Technologies
 
 #### [Cypress](https://www.cypress.io/)
-Cypress is a next-generation front-end testing tool built for modern web applications. It enables developers to write tests in JavaScript, offering fast, reliable end-to-end, integration, regression, and unit testing for anything that runs in a browser.
+A next-generation front-end testing tool for modern web applications, enabling developers to write fast, reliable tests in JavaScript.
 
 #### [Cucumber](https://cucumber.io/)
-Cucumber supports Behavior-Driven Development (BDD), allowing you to write tests in a natural language that can be understood by all stakeholders, facilitating better communication and collaboration.
+Supports Behavior-Driven Development (BDD), allowing tests to be written in natural language for better communication and collaboration.
 
 #### [Cypress Cloud](https://www.cypress.io/cloud)
-Cypress Cloud provides a scalable, managed environment for running Cypress tests in the cloud. It features parallelization, detailed dashboards, and enhanced test insights, making it easier to manage large test suites.
+Offers a scalable, managed environment for running Cypress tests in the cloud, featuring parallelization and detailed dashboards.
 
-#### [Git](https://git-scm.com/)
-Git is a distributed version control system that allows developers to work together efficiently, track changes, and control software versions. It is essential for team collaboration and maintaining code integrity.
+#### [Version Control](https://git-scm.com/)
+ A distributed version control system essential for efficient team collaboration, change tracking, and maintaining code integrity.
 
-#### [GitHub](https://github.com/)
-GitHub supports Git for version control and provides a collaborative environment for hosting, reviewing code, managing projects, and building software. It integrates seamlessly with many development tools and workflows.
+#### [Code Hosting](https://github.com/)
+Provides a collaborative environment for version control, code hosting, project management, and software development workflows.
 
-#### [Node.js](https://nodejs.org/)
-This repository utilizes Node.js, a powerful JavaScript runtime environment, to execute Cypress tests. Node.js enables seamless integration with Cypress, supports modern JavaScript features, and provides access to a vast ecosystem of packages via npm (Node Package Manager). Its asynchronous and event-driven architecture ensures efficient execution, making it an ideal choice for building scalable Cypress automation frameworks.
+#### [Runtime Environment](https://nodejs.org/)
+Relies on Node.js for executing Cypress tests, providing modern JavaScript support and npm package access.
 
-#### [Visual Studio Code](https://code.visualstudio.com/)
-Visual Studio Code is a lightweight yet powerful source code editor. It is widely used for practicing HTML, CSS, and other programming languages, offering numerous extensions that enhance development productivity.
+#### [Code Editor](https://code.visualstudio.com/)
+Utilizes Visual Studio Code, a versatile and feature-rich editor, for coding and development tasks.
 
 ### Brief Overview of Cypress IO
 
@@ -54,7 +54,7 @@ Cypress offers several key features, including:
 From clone to installation/configuration:
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [Node.js](https://nodejs.org/)
-3. Clone the repository: [Cypress UI API Automation](https://github.com/gurjarvikram/cypress-ui-api-automation.git)
+3. Clone the repository: [Cypress UI Automation](https://github.com/gurjarvikram/cypress-ui-api-automation.git)
 4. Configure Git
 5. Install Cypress:
 
@@ -156,10 +156,12 @@ jobs:
 
 #### Recording the Script from a Local System into Cypress Cloud
 
+- To record a single feature:
 ```sh
 npx cypress run --spec <relative path of the feature file> --record --key <record key>
 ```
 
+- To record entire test suites:
 ```sh
 npx cypress run --record --key <record key>
 ```
