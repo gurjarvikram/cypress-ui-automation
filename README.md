@@ -17,17 +17,14 @@ Cucumber supports Behavior-Driven Development (BDD), allowing you to write tests
 #### [Cypress Cloud](https://www.cypress.io/cloud)
 Cypress Cloud provides a scalable, managed environment for running Cypress tests in the cloud. It features parallelization, detailed dashboards, and enhanced test insights, making it easier to manage large test suites.
 
-#### [Jira](https://www.atlassian.com/software/jira)
-Jira is a powerful project management tool used for issue tracking and project management. It helps teams plan, track, and manage Agile software development projects efficiently, ensuring smooth workflows and effective collaboration.
-
 #### [Git](https://git-scm.com/)
 Git is a distributed version control system that allows developers to work together efficiently, track changes, and control software versions. It is essential for team collaboration and maintaining code integrity.
 
 #### [GitHub](https://github.com/)
 GitHub supports Git for version control and provides a collaborative environment for hosting, reviewing code, managing projects, and building software. It integrates seamlessly with many development tools and workflows.
 
-#### [Postman](https://www.postman.com/)
-Postman is a collaboration platform for API development. It simplifies the process of building, testing, and documenting APIs, making it an essential tool for ensuring API reliability and performance.
+#### [Node.js](https://nodejs.org/)
+This repository utilizes Node.js, a powerful JavaScript runtime environment, to execute Cypress tests. Node.js enables seamless integration with Cypress, supports modern JavaScript features, and provides access to a vast ecosystem of packages via npm (Node Package Manager). Its asynchronous and event-driven architecture ensures efficient execution, making it an ideal choice for building scalable Cypress automation frameworks.
 
 #### [Visual Studio Code](https://code.visualstudio.com/)
 Visual Studio Code is a lightweight yet powerful source code editor. It is widely used for practicing HTML, CSS, and other programming languages, offering numerous extensions that enhance development productivity.
