@@ -162,5 +162,10 @@ jobs:
 ```sh
 npx cypress run --spec <relative path of the feature file> --record --key <record key>
 ```
+
+```sh
+npx cypress run --record --key <record key>
+```
+
 ### License
 The Cypress io framework is a free, [open-source](https://github.com/cypress-io/cypress) software licensed under the [MIT license](https://opensource.org/license/MIT).
