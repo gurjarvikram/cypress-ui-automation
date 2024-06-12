@@ -18,7 +18,7 @@ class loginPage {
         cy.get(PASSWORD_INPUT).type(password, { sensitive: true })
     }
 
-    static login() {
+    static loginBtn() {
         cy.get(LOGIN_BUTTON).click()
     }
 
@@ -38,7 +38,7 @@ class loginPage {
             cy.get(LOGIN_BUTTON, { timeout: 15000 }).click()
         })
     }
- 
 }
 
 export default loginPage
+

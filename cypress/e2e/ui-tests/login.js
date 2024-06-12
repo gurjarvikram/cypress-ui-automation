@@ -7,7 +7,7 @@ Given('The user navigates to the login page', () => {
 })
 
 When('The user clicks on the login button', () => {
-  loginPage.login()
+  loginPage.loginBtn()
 })
 
 When('The user enters a correct username', () => {
@@ -30,7 +30,7 @@ Then('The user should see an error message indicating incorrect credentials', ()
 })
 
 When('The user clicks the login button without entering credentials', () => {
-  loginPage.login()
+  loginPage.loginBtn()
 })
 
 When('The user should remain on the same URL', () => {
@@ -48,6 +48,8 @@ When('The user enters valid username and password', () => {
     loginPage.fillPassword(user.password)
   })
 })
+
+
 
 Then('The user should be redirected to the product listing', () => {
   loginPage.productListing()

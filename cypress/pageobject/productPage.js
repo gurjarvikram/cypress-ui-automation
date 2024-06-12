@@ -4,7 +4,6 @@ const firstName = faker.name.firstName();
 const lastName = faker.name.lastName();
 const postalCode = faker.address.zipCode();
 
-
 class productPage {
 
     static sortingIcon() {
@@ -39,15 +38,37 @@ class productPage {
                 expect(texts).to.deep.equal(sortedTexts);
             });
     }
-    static add_cart_btn() {
+    static add_cart_btn_single_prod() {
         cy.get('.title')
             .should('contain', 'Products')
         cy.get("#add-to-cart-sauce-labs-backpack").click()
+    }
+    static add_cart_btn_multi_prod() {
+        cy.get('.title')
+            .should('contain', 'Products')
+        cy.get("#add-to-cart-sauce-labs-backpack").click()
+            .get("#add-to-cart-sauce-labs-bike-light").click()
     }
     static shopping_cart_badge() {
         cy.get(".shopping_cart_badge").click()
         cy.url()
             .should('include', 'cart.html')
+    }
+    static product_qty() {
+        // Retrieve all elements with the class 'inventory_item_name'        
+        cy.get("div[class='inventory_item_name']").then(($elements) => {
+            const length = $elements.length;
+
+            // If only one element is found, assert that the length is 1
+            if (length === 1) {
+                cy.get("div[class='inventory_item_name']").should('have.length', 1);
+            }
+            // If more than one element is found, assert that the length is greater than 1
+            else {
+                cy.get("div[class='inventory_item_name']").should('have.length.greaterThan', 1);
+            }
+        });
+
     }
     static your_cart_details() {
         // Ensure the title 'Your Cart' is displayed
@@ -98,6 +119,25 @@ class productPage {
     static checkout_btn() {
         // Click on the checkout button from the cart
         cy.get("#checkout").click()
+    }
+    static click_continue_btn() {
+        // Click on the continue button from the cart
+        cy.get("#continue").click()
+    }
+    static validation_msg() {
+        cy.get("h3[data-test='error']")
+            .should('have.text', 'Error: First Name is required')
+
+        cy.get('#first-name').type(firstName)
+        cy.get("#continue").click()
+
+        cy.contains('Error: Last Name is required')
+            .should('contain', 'Error: Last Name is required')
+
+        cy.get('#last-name').type(lastName)
+        cy.get("#continue").click()
+        cy.contains('Error: Postal Code is required')
+            .should('contain', 'Error: Postal Code is required')
     }
     static navigate_To_checkout() {
         // Ensure the navigate to the checkout page
@@ -173,10 +213,7 @@ class productPage {
         // Ensure the 'Back Home' button is displayed
         cy.contains('button', 'Back Home')
             .should('be.visible')
-
     }
-
-
 }
 
 export default productPage
