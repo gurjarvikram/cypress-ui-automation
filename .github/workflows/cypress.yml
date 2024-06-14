@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: Cypress Tests Execution
 
 on: [push, pull_request]
 
@@ -19,9 +19,23 @@ jobs:
         with:
           node-version: '20' # Specify the Node.js version you need
       
-      - name: Install cypress
-        run: npm install cypress --save -dev
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Cypress
+        run: npm install cypress --save-dev
+
+      - name: Install Cypress GitHub Action
+        uses: cypress-io/github-action@v2
 
       - name: Run Cypress tests
-        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
-
+        uses: cypress-io/github-action@v2
+        with:
+          spec: "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
+          parallel: true
+          record: true
+          group: 'GitHub Actions'
+        env:
+          # Set your Cypress Dashboard project ID and record key
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
