@@ -28,7 +28,7 @@ jobs:
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
-          spec: "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
+          run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
           parallel: true
           record: true
           group: 'GitHub Actions'
