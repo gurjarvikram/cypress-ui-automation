@@ -19,21 +19,16 @@ jobs:
         with:
           node-version: '20' # Specify the Node.js version you need
 
-      - name: Install Cypress
-        run: npm install cypress --save-dev
-
-      - name: Install Cypress GitHub Action
-        uses: cypress-io/github-action@v2
+      - name: Install dependencies
+        run: npm install
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v2
         with:
-          run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
-          parallel: true
-          record: true
-          group: 'GitHub Actions'
-          cache: ${{ runner.os }}-cache-${{ github.run_id }}  # Example using runner OS and run ID
+          spec: cypress/e2e/ui-tests/${{ matrix.spec-file }}
         env:
-          # Set your Cypress Dashboard project ID and record key
-          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_PARALLEL: true
+          CYPRESS_GROUP: 'GitHub Actions'
+          CYPRESS_CACHE_KEY: ${{ runner.os }}-cache-${{ github.run_id }} # Example using runner OS and run ID
