@@ -1,4 +1,4 @@
-name: Cypress Tests Execution
+name: Cypress Tests
 
 on: [push, pull_request]
 
@@ -18,25 +18,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20' # Specify the Node.js version you need
-
-      - name: Cache NPM dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            npm-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: npm install
+      
+      - name: Install cypress
+        run: npm install cypress --save-dev
 
       - name: Run Cypress tests
-        uses: cypress-io/github-action@v2
-        with:
-          spec: cypress/e2e/ui-tests/${{ matrix.spec-file }}
-        env:
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-          CYPRESS_PARALLEL: true
-          CYPRESS_GROUP: 'GitHub Actions'
-          CYPRESS_CACHE_KEY: ${{ runner.os }}-cache-${{ github.run_id }} # Example using runner OS and run ID
+        run: npx cypress run --spec "cypress/e2e/ui-tests/${{ matrix.spec-file }}"
