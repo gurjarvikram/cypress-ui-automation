@@ -6,6 +6,7 @@ const ERROR_MSG = '.text-red-600'
 
 
 class loginPage {
+
     static navigate_To_Login_Page() {
         cy.visit('/')
     }
