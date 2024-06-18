@@ -1,4 +1,5 @@
 Feature: Product page
+
     Background:
         Given The user logged in and navigated to the product page
 
