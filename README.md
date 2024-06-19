@@ -54,7 +54,7 @@ Cypress offers several key features, including:
 From clone to installation/configuration:
 1. Install [VS Code](https://code.visualstudio.com/)
 2. Install [Node.js](https://nodejs.org/)
-3. Clone the repository: [Cypress UI Automation](https://github.com/gurjarvikram/cypress-ui-api-automation.git)
+3. Clone the repository: [Cypress UI Automation](https://github.com/gurjarvikram/cypress-ui-automation.git)
 4. Configure Git
 5. Install Cypress:
 
@@ -68,14 +68,15 @@ From clone to installation/configuration:
    - Feature Files: Contain the test scenarios using the Gherkin language with Given, When, And, Then keywords.
 3. Step Definitions
 4. POM (Page Object Model)
-5. CI/CD with GitHub Actions:
-   - Parallel Execution Across Browsers: The cypress-browsers.yml workflow runs Cypress tests in parallel across different browsers (Chrome, Firefox, and Electron).
+5. CI and GitHub Actions + Cypress io: Running Tests Across Multiple Browsers:
+   - Overview:
+     This repository demonstrates how to configure and execute Cypress tests across multiple browsers using Continuous Integration (CI) with GitHub Actions. Testing across various browsers such as Chrome, Firefox, and Electron ensures  comprehensive coverage and compatibility testing of your web applications.
 
 ```bash
 
-name: Cypress Parallel Browser Tests
+name: Cypress Cross Browser Tests
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   cypress-run:
@@ -102,8 +103,50 @@ jobs:
         run: |
           npx cypress run --browser ${{ matrix.browser }} --spec "cypress/integration/${{ matrix.spec_file }}"
 ```
-  
-6. CI/CD with Circle CI:
+6. CI and GitHub Actions + Cypress io: Running Tests in Parallel
+   - Overview:
+     This repository demonstrates how to implement parallel execution of Cypress tests using Continuous Integration (CI) with GitHub Actions and Cypress Cloud. Parallelization allows for faster test execution and efficient utilization of resources.  
+
+```bash
+
+name: Parallel Cypress Tests
+
+on: push
+jobs:
+  test:
+    name: Cypress run
+    runs-on: ubuntu-22.04
+    strategy:
+      # when one test fails, DO NOT cancel the other
+      # containers, because this will kill Cypress processes
+      # leaving Cypress Cloud hanging ...
+      # https://github.com/cypress-io/github-action/issues/48
+      fail-fast: false
+      matrix:
+        # run 3 copies of the current job in parallel
+        containers: [1, 2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # because of "record" and "parallel" parameters
+      # these containers will load balance all found tests among themselves
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          record: true
+          parallel: true
+          group: 'Actions example'
+        env:
+          # pass the Cypress Cloud record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Recommended: pass the GitHub token lets this action correctly
+          # determine the unique run id necessary to re-run the checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+```
+
+7. CI/CD with Circle CI:
 
 ```bash
 
@@ -129,7 +172,7 @@ jobs:
           command: npx cypress run
 ```
           
-7. Cypress Cloud:
+8. Cypress Cloud:
     - We can see the recorded tests for this project at the [Cypress Cloud](https://cloud.cypress.io/organizations/9698d65f-c3dd-49fd-87f6-c1db1218f678/projects) link.
 
 ### How to Run & Record Cypress Scripts into Cypress Cloud
