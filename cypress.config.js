@@ -27,7 +27,6 @@ const createEsbuildPlugin =
     specPattern: 'cypress/e2e/*/*.feature',
     viewportWidth: 1880,
     viewportHeight: 882,   
-    experimentalSessionAndOrigin: true,
     experimentalModifyObstructiveThirdPartyCode: true,
     experimentalRunAllSpecs: true,
     "chromeWebSecurity" : false
