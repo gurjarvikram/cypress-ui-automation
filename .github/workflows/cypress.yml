@@ -25,7 +25,7 @@ jobs:
           record: true
           parallel: true
           group: 'Actions example'
-          spec: ccypress/e2e/ui-tests/product.feature  # Replace with your feature file path
+          spec: cypress/e2e/ui-tests/product.feature  # Replace with your feature file path
         env:
           # pass the Cypress Cloud record key as an environment variable
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
