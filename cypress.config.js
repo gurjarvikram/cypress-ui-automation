@@ -9,7 +9,6 @@ const createEsbuildPlugin =
   e2e: {
     baseUrl: 'https://www.saucedemo.com',  // Set your base URL here
     
-
     env:{
       requestMode: true,
     },
