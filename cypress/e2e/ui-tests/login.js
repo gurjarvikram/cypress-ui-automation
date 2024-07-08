@@ -9,24 +9,13 @@ Given('The user navigates to the login page', () => {
 When('The user clicks on the login button', () => {
   loginPage.loginBtn()
 })
-
-When('The user enters a correct username', () => {
-  cy.fixture('users').then((users) => {
-    const user = users[0];      // Get the first user from json file
-    loginPage.fillUsername(user.username)
-
-  })
-})
-When('The user enters an incorrect password', () => {
-  cy.fixture('users').then((users) => {
-    const user = users[1];      // Get the second user password from json file
-    loginPage.fillPassword(user.password)
-  })
+When('The user enters the username {string} and password {string}', (username, password) => {
+  loginPage.fillUsername(username)
+  loginPage.fillPassword(password)
 })
 
-Then('The user should see an error message indicating incorrect credentials', () => {
-  let incorrect_cred = 'Username and password do not match any user in this service'
-  loginPage.errorMsg(incorrect_cred)
+Then('The user should see an error message {string}', (expected_message) => {
+  cy.contains(expected_message).should('be.visible')
 })
 
 When('The user clicks the login button without entering credentials', () => {
@@ -48,8 +37,6 @@ When('The user enters valid username and password', () => {
     loginPage.fillPassword(user.password)
   })
 })
-
-
 
 Then('The user should be redirected to the product listing', () => {
   loginPage.productListing()

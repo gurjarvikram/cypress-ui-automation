@@ -15,8 +15,7 @@ When('The user clicks on the toggle button', () => {
 When('The user should see data points on the navigation bar', (dataTable) => {
 
     // Get the expected data points from the dataTable
-    const expectedDataPoints = dataTable.raw().flat();
-
+    const expectedDataPoints = dataTable.rawTable.slice(1).flat();
 
     // Get the actual data points from the navigation bar
     cy.get('.bm-item-list').each((item, index) => {

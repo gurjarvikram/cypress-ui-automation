@@ -26,7 +26,7 @@ class loginPage {
     static errorMsg(error_msg) {
         cy.get("h3[data-test='error']").should('contain', error_msg)
     }
-    
+
     static productListing(error_msg) {
         cy.get('.app_logo').should('contain', 'Swag Labs')
     }

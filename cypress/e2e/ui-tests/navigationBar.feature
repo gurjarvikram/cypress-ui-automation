@@ -6,6 +6,7 @@ Feature: Navigation Bar
     Scenario: Verify the data points on the left navigation bar
         When The user clicks on the toggle button
         Then The user should see data points on the navigation bar
+            | Data Points     |
             | All Items       |
             | About           |
             | Logout          |
