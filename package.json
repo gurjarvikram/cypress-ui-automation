@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "regression": "npx cypress run",
+    "recordTestsCloud": "npx cypress run --record --key 8c2c101b-8268-4042-8992-24e85274351a",
+    "parallelTests": "npx cypress run --record --key 8c2c101b-8268-4042-8992-24e85274351a --parallel --ci-build-id $(date +%s) --group 'parallel-tests'"
   },
   "author": "",
   "license": "ISC",
