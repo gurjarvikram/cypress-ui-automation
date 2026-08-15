@@ -33,14 +33,15 @@
     "test:firefox": "cypress run --browser firefox",
     "test:electron": "cypress run --browser electron",
     "test:headed": "cypress run --headed --no-exit",
-    "test:record": "cypress run --record",
-    "test:parallel": "cypress run --record --parallel --group parallel-tests"
+    "test:record": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record",
+    "test:parallel": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record --parallel --group parallel-tests"
   },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@faker-js/faker": "^10.0.0",
     "cypress": "^15.0.0",
+    "dotenv": "^17.4.2",
     "esbuild": "^0.28.0"
   }
 }

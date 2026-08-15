@@ -1,3 +1,7 @@
+// Load .env before anything reads process.env, so local runs pick up
+// CYPRESS_BASE_URL and CYPRESS_RECORD_KEY without exporting them by hand.
+require('dotenv').config();
+
 const { defineConfig } = require('cypress');
 const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
 const {
@@ -30,8 +34,8 @@ module.exports = defineConfig({
   viewportHeight: 900,
 
   e2e: {
-    // Override per environment with CYPRESS_BASE_URL.
-    baseUrl: 'https://www.saucedemo.com',
+    // Override per environment with CYPRESS_BASE_URL (env var or .env file).
+    baseUrl: process.env.CYPRESS_BASE_URL || 'https://www.saucedemo.com',
 
     specPattern: 'cypress/e2e/features/**/*.feature',
     supportFile: 'cypress/support/e2e.js',
