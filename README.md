@@ -65,6 +65,17 @@ an HTML report plus screenshots and video for every failure.
 | npm | `>= 10` (ships with Node 20) |
 | OS | Linux, macOS or Windows — plus the Cypress [system dependencies](https://docs.cypress.io/app/get-started/install-cypress#System-requirements) |
 
+Cypress 15 drives browsers over WebDriver BiDi, which sets a floor on local browser versions:
+
+| Browser | Minimum | Notes |
+| --- | --- | --- |
+| Electron | — | Bundled with Cypress; always works, used by `npm test` |
+| Chrome / Edge | Current stable | |
+| Firefox | **140** | Cypress refuses to start on older builds; see [Troubleshooting](#troubleshooting) |
+
+Only Electron is required — the browser-specific scripts are optional locally, and CI runs the
+full matrix regardless.
+
 ```bash
 nvm use          # picks up .nvmrc
 node --version   # v20.x
@@ -403,7 +414,9 @@ missing, rather than erroring deep inside the Cypress run.
 | `Step implementation missing` | Step text in the feature does not match any definition. Check the wording, including `{string}` and `{int}` placeholders. |
 | `cy.visit()` failed … `404: Not Found` | Swag Labs serves only `/`; routes such as `/inventory.html` are client-side. Navigate through the UI rather than deep-linking. |
 | Cypress binary missing or corrupt | `npx cypress install --force`, then `npx cypress verify`. |
-| Browser not found in the matrix | Chrome and Firefox must be installed locally. Electron ships with Cypress: `npm run test:electron`. |
+| Browser not found | Chrome, Edge and Firefox must be installed locally. Electron always works: `npm run test:electron`. |
+| `Cypress does not support running Firefox version <140>` | Cypress 15 needs Firefox 140+ for WebDriver BiDi. Upgrade Firefox, or use `npm run test:chrome` / `test:electron` locally — CI runners carry a current build. |
+| `allowCypressEnv` warning on every run | Expected. The Cucumber preprocessor reads tags through `Cypress.env()`, so `allowCypressEnv` must stay enabled; setting it to `false` breaks tag filtering. Harmless until the preprocessor migrates to `cy.env()`. |
 | Recorded run rejected | `CYPRESS_RECORD_KEY` is unset or was rotated. Export it, or update the GitHub Actions secret. |
 | `Unknown TEST_ENV "…"` | The name is not in `config/environments.json`. Add it there, or use `CYPRESS_BASE_URL` for a one-off. |
 | Suite passes but proves nothing | Mutate the expectation and confirm it fails. See step 4 of [Writing a new test](#writing-a-new-test). |
