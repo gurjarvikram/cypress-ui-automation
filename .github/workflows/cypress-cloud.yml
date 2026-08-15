@@ -1,0 +1,65 @@
+name: Cypress Cloud (parallel)
+
+# Recorded parallel runs consume Cypress Cloud credits and need a secret that
+# is unavailable to pull requests from forks, so this is kept off the PR path.
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Nightly regression against the deployed demo site, 02:00 UTC.
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: cypress-cloud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  record:
+    name: Recorded run (${{ matrix.container }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      # Do not cancel siblings: killing a container mid-run leaves the
+      # Cypress Cloud run hanging.
+      # https://github.com/cypress-io/github-action/issues/48
+      fail-fast: false
+      matrix:
+        container: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Verify record key is configured
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+        run: |
+          if [ -z "$CYPRESS_RECORD_KEY" ]; then
+            echo "::error::CYPRESS_RECORD_KEY secret is not set. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          record: true
+          parallel: true
+          group: regression-chrome
+          browser: chrome
+          spec: cypress/e2e/features/**/*.feature
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # Lets the action resolve the unique run id so re-running checks works.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-artefacts-${{ matrix.container }}
+          path: cypress/reports
+          retention-days: 7

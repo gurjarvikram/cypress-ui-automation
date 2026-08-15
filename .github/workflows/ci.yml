@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer commit on the same branch makes an in-flight run obsolete.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke (chrome)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Run smoke suite
+        uses: cypress-io/github-action@v6
+        with:
+          browser: chrome
+          command: npm run test:smoke
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-artefacts
+          path: cypress/reports
+          retention-days: 7
+
+  regression:
+    name: Regression (${{ matrix.browser }})
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      # One browser failing should not mask the result of the others.
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, electron]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Run regression suite
+        uses: cypress-io/github-action@v6
+        with:
+          browser: ${{ matrix.browser }}
+          command: npm run test:regression
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-artefacts-${{ matrix.browser }}
+          path: cypress/reports
+          retention-days: 7
+
+      - name: Upload Cucumber HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-report-${{ matrix.browser }}
+          path: cypress/reports/cucumber
+          retention-days: 7
