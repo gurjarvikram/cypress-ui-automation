@@ -1,64 +1,35 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-// import 'cypress-plugin-api'
-
-//import cypress = require("cypress");
-
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 /// <reference types="cypress" />
 
+/**
+ * Custom commands and command overrides.
+ * https://on.cypress.io/custom-commands
+ */
 
-
-// Override the type command to handle sensitive data
+/**
+ * `cy.type(value, { sensitive: true })` masks the value in the command log and
+ * in Cypress Cloud, so credentials never appear in a recorded run.
+ */
 Cypress.Commands.overwrite('type', (originalFn, element, text, options) => {
   if (options && options.sensitive) {
-    // turn off original log
-    options.log = false;
-    // create our own log with masked message
     Cypress.log({
       $el: element,
       name: 'type',
       message: '*'.repeat(text.length),
     });
+
+    return originalFn(element, text, { ...options, log: false });
   }
 
   return originalFn(element, text, options);
 });
 
-// cypress.Commands.add('login', (username, password) => {
-
-//   cy.session([username, password], () => {
-//     cy.visit('/')
-//     cy.get('#user-name', { timeout: 15000 }).type(username)
-//     cy.get('#password', { timeout: 15000 }).type(password, { sensitive: true })
-//     cy.get('#login-button', { timeout: 15000 }).click()
-//     cy.get('.title').should('contain', 'Products')
-
-//   })
-
-// })
-
-
-
-
+/**
+ * Selects an element by its `data-test` attribute.
+ * Prefer this over CSS/class selectors: `data-test` is a contract the
+ * application owns, so restyling cannot break the suite.
+ *
+ * @example cy.getByTestId('login-button').click()
+ */
+Cypress.Commands.add('getByTestId', (testId, options) =>
+  cy.get(`[data-test="${testId}"]`, options),
+);
