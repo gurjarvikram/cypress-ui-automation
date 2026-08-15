@@ -1,10 +1,18 @@
-[
-  {
+{
+  "standard": {
     "username": "standard_user",
     "password": "secret_sauce"
   },
-  {
-    "username": "fakecrm@gmail.com",
-    "password": "ddfd7676ghgh"
+  "lockedOut": {
+    "username": "locked_out_user",
+    "password": "secret_sauce"
+  },
+  "problem": {
+    "username": "problem_user",
+    "password": "secret_sauce"
+  },
+  "performanceGlitch": {
+    "username": "performance_glitch_user",
+    "password": "secret_sauce"
   }
-]
+}

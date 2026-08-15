@@ -1,25 +1,48 @@
 {
-  "name": "ui-api-cypress",
+  "name": "cypress-ui-automation",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Cypress + Cucumber (BDD) UI automation framework for the Swag Labs demo shop, with Page Object Model, tag-based execution and GitHub Actions CI.",
+  "keywords": [
+    "cypress",
+    "cucumber",
+    "bdd",
+    "gherkin",
+    "page-object-model",
+    "test-automation",
+    "e2e-testing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gurjarvikram/cypress-ui-automation.git"
+  },
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
-    "regression": "npx cypress run",
-    "recordTestsCloud": "npx cypress run --record --key 8c2c101b-8268-4042-8992-24e85274351a",
-    "parallelTests": "npx cypress run --record --key 8c2c101b-8268-4042-8992-24e85274351a --parallel --ci-build-id $(date +%s) --group 'parallel-tests'"
+    "clean": "node -e \"require('fs').rmSync('cypress/reports', { recursive: true, force: true })\"",
+    "pretest": "npm run clean",
+    "test": "cypress run",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test:smoke": "cypress run --env tags=@smoke",
+    "test:regression": "cypress run --env tags=@regression",
+    "test:negative": "cypress run --env tags=@negative",
+    "test:chrome": "cypress run --browser chrome",
+    "test:firefox": "cypress run --browser firefox",
+    "test:edge": "cypress run --browser edge",
+    "test:electron": "cypress run --browser electron",
+    "test:headed": "cypress run --headed --no-exit",
+    "test:record": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record",
+    "test:parallel": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record --parallel --group parallel-tests"
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "@badeball/cypress-cucumber-preprocessor": "^20.0.5",
-    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
-    "@faker-js/faker": "^7.6.0",
-    "cypress": "^13.12.0",
-    "cypress-file-upload": "^5.0.8",
-    "esbuild": "^0.17.17",
-    "fs": "^0.0.1-security"
-  },
-  "dependencies": {
-    "cypress-parallel": "^0.14.0"
+    "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
+    "@faker-js/faker": "^10.0.0",
+    "cypress": "^15.0.0",
+    "dotenv": "^17.4.2",
+    "esbuild": "^0.28.0"
   }
 }
