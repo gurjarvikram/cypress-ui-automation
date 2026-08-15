@@ -1,7 +1,7 @@
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor';
 import navigationMenu from '../pages/NavigationMenu';
 import loginPage from '../pages/LoginPage';
-import inventoryPage from '../pages/InventoryPage';
+import { inventoryObjects } from '../object-repository';
 
 When('the user opens the side navigation menu', () => {
   navigationMenu.open();
@@ -22,5 +22,5 @@ Then('the user should be returned to the login page', () => {
 
 Then('the session should be cleared', () => {
   cy.getCookie('session-username').should('not.exist');
-  cy.get(inventoryPage.selectors.inventoryItem).should('not.exist');
+  cy.get(inventoryObjects.inventoryItem).should('not.exist');
 });

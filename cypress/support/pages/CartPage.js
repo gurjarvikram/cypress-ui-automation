@@ -1,54 +1,42 @@
 /// <reference types="cypress" />
 
+import { cartObjects } from '../object-repository';
+
 /** Shopping cart page (`/cart.html`). */
 class CartPage {
-  selectors = Object.freeze({
-    title: '[data-test="title"]',
-    cartList: '[data-test="cart-list"]',
-    cartItem: '[data-test="inventory-item"]',
-    itemName: '[data-test="inventory-item-name"]',
-    itemQuantity: '[data-test="item-quantity"]',
-    quantityLabel: '[data-test="cart-quantity-label"]',
-    descriptionLabel: '[data-test="cart-desc-label"]',
-    continueShopping: '[data-test="continue-shopping"]',
-    checkout: '[data-test="checkout"]',
-    cartBadge: '[data-test="shopping-cart-badge"]',
-    removeButton: (product) => `[data-test="remove-${product}"]`,
-  });
-
   shouldBeLoaded() {
     cy.url().should('include', '/cart.html');
-    cy.get(this.selectors.title).should('have.text', 'Your Cart');
+    cy.get(cartObjects.title).should('have.text', 'Your Cart');
   }
 
   /** Asserts the cart holds exactly `count` line items. */
   shouldContainItems(count) {
-    cy.get(this.selectors.cartItem).should('have.length', count);
+    cy.get(cartObjects.cartItem).should('have.length', count);
   }
 
   shouldContainProduct(name) {
-    cy.get(this.selectors.itemName).should('contain.text', name);
+    cy.get(cartObjects.itemName).should('contain.text', name);
   }
 
   shouldShowLineItemDetails() {
-    cy.get(this.selectors.quantityLabel).should('have.text', 'QTY');
-    cy.get(this.selectors.descriptionLabel).should('have.text', 'Description');
-    cy.get(this.selectors.itemQuantity).should('be.visible');
-    cy.get(this.selectors.continueShopping).should('be.visible');
-    cy.get(this.selectors.checkout).should('be.visible');
+    cy.get(cartObjects.quantityLabel).should('have.text', 'QTY');
+    cy.get(cartObjects.descriptionLabel).should('have.text', 'Description');
+    cy.get(cartObjects.itemQuantity).should('be.visible');
+    cy.get(cartObjects.continueShopping).should('be.visible');
+    cy.get(cartObjects.checkout).should('be.visible');
   }
 
   removeProduct(product) {
-    cy.get(this.selectors.removeButton(product)).click();
+    cy.get(cartObjects.removeButton(product)).click();
   }
 
   shouldBeEmpty() {
-    cy.get(this.selectors.cartItem).should('not.exist');
-    cy.get(this.selectors.cartBadge).should('not.exist');
+    cy.get(cartObjects.cartItem).should('not.exist');
+    cy.get(cartObjects.cartBadge).should('not.exist');
   }
 
   checkout() {
-    cy.get(this.selectors.checkout).click();
+    cy.get(cartObjects.checkout).click();
   }
 }
 

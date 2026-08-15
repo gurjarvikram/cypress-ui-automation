@@ -1,33 +1,24 @@
 /// <reference types="cypress" />
 
-/** Product listing page shown after a successful login. */
-class InventoryPage {
-  selectors = Object.freeze({
-    title: '[data-test="title"]',
-    sortContainer: '[data-test="product-sort-container"]',
-    activeSortOption: '[data-test="active-option"]',
-    inventoryItem: '[data-test="inventory-item"]',
-    itemName: '[data-test="inventory-item-name"]',
-    cartLink: '[data-test="shopping-cart-link"]',
-    cartBadge: '[data-test="shopping-cart-badge"]',
-    addToCart: (product) => `[data-test="add-to-cart-${product}"]`,
-  });
+import { inventoryObjects } from '../object-repository';
 
+/** Product listing page (`/inventory.html`), shown after a successful login. */
+class InventoryPage {
   shouldBeLoaded() {
     cy.url().should('include', '/inventory.html');
-    cy.get(this.selectors.title).should('have.text', 'Products');
+    cy.get(inventoryObjects.title).should('have.text', 'Products');
   }
 
   /** Yields the visible product names, in the order the page renders them. */
   productNames() {
     return cy
-      .get(this.selectors.itemName)
+      .get(inventoryObjects.itemName)
       .then(($names) => Cypress._.map($names, (el) => el.innerText.trim()));
   }
 
   selectSortOption(option) {
-    cy.get(this.selectors.sortContainer).select(option);
-    cy.get(this.selectors.activeSortOption).should('have.text', option);
+    cy.get(inventoryObjects.sortContainer).select(option);
+    cy.get(inventoryObjects.activeSortOption).should('have.text', option);
   }
 
   /**
@@ -46,19 +37,19 @@ class InventoryPage {
   }
 
   addProductToCart(product) {
-    cy.get(this.selectors.addToCart(product)).click();
+    cy.get(inventoryObjects.addToCart(product)).click();
   }
 
   shouldShowCartBadgeCount(count) {
     if (count === 0) {
-      cy.get(this.selectors.cartBadge).should('not.exist');
+      cy.get(inventoryObjects.cartBadge).should('not.exist');
       return;
     }
-    cy.get(this.selectors.cartBadge).should('have.text', String(count));
+    cy.get(inventoryObjects.cartBadge).should('have.text', String(count));
   }
 
   openCart() {
-    cy.get(this.selectors.cartLink).click();
+    cy.get(inventoryObjects.cartLink).click();
   }
 }
 

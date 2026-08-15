@@ -1,34 +1,29 @@
 /// <reference types="cypress" />
 
+import { loginObjects } from '../object-repository';
+
 /**
- * Login page (https://www.saucedemo.com/).
+ * Login page (`/`).
  *
- * Selectors are exposed as a frozen `selectors` map so that step definitions
- * never hard-code a selector string of their own.
+ * Behaviour only — every selector comes from the object repository
+ * (`cypress/support/object-repository/login.objects.js`).
  */
 class LoginPage {
-  selectors = Object.freeze({
-    username: '[data-test="username"]',
-    password: '[data-test="password"]',
-    loginButton: '[data-test="login-button"]',
-    error: '[data-test="error"]',
-  });
-
   visit() {
     cy.visit('/');
-    cy.get(this.selectors.loginButton).should('be.visible');
+    cy.get(loginObjects.loginButton).should('be.visible');
   }
 
   fillUsername(username) {
-    cy.get(this.selectors.username).clear().type(username);
+    cy.get(loginObjects.username).clear().type(username);
   }
 
   fillPassword(password) {
-    cy.get(this.selectors.password).clear().type(password, { sensitive: true });
+    cy.get(loginObjects.password).clear().type(password, { sensitive: true });
   }
 
   submit() {
-    cy.get(this.selectors.loginButton).click();
+    cy.get(loginObjects.loginButton).click();
   }
 
   /**
@@ -50,7 +45,7 @@ class LoginPage {
   /**
    * Logs in as a named user from the `users` fixture.
    * These are the demo site's public credentials; for a real application load
-   * them from the environment instead (see the Configuration section of the README).
+   * them from the environment instead (see the README's Configuration section).
    */
   loginAsUser(role = 'standard') {
     cy.fixture('users').then((users) => {
@@ -61,12 +56,12 @@ class LoginPage {
   }
 
   shouldShowError(message) {
-    cy.get(this.selectors.error).should('be.visible').and('contain.text', message);
+    cy.get(loginObjects.error).should('be.visible').and('contain.text', message);
   }
 
   shouldBeOnLoginPage() {
     cy.url().should('not.include', '/inventory.html');
-    cy.get(this.selectors.loginButton).should('be.visible');
+    cy.get(loginObjects.loginButton).should('be.visible');
   }
 }
 
