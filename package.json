@@ -31,6 +31,7 @@
     "test:negative": "cypress run --env tags=@negative",
     "test:chrome": "cypress run --browser chrome",
     "test:firefox": "cypress run --browser firefox",
+    "test:edge": "cypress run --browser edge",
     "test:electron": "cypress run --browser electron",
     "test:headed": "cypress run --headed --no-exit",
     "test:record": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record",

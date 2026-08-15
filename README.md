@@ -65,6 +65,11 @@ an HTML report plus screenshots and video for every failure.
 | npm | `>= 10` (ships with Node 20) |
 | OS | Linux, macOS or Windows — plus the Cypress [system dependencies](https://docs.cypress.io/app/get-started/install-cypress#System-requirements) |
 
+```bash
+nvm use          # picks up .nvmrc
+node --version   # v20.x
+```
+
 Cypress 15 drives browsers over WebDriver BiDi, which sets a floor on local browser versions:
 
 | Browser | Minimum | Notes |
@@ -88,12 +93,18 @@ curl -L -o /tmp/firefox.tar.xz \
   "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
 tar -xJf /tmp/firefox.tar.xz -C ~/.local/opt
 
-# Make it the firefox Cypress finds
-export PATH="$HOME/.local/opt/firefox:$PATH"   # add to ~/.bashrc to persist
+# Make it the firefox Cypress finds. ~/.local/bin is usually already on PATH
+# ahead of /usr/bin, so this needs no shell-profile edit and no root.
+mkdir -p ~/.local/bin
+ln -sfn ~/.local/opt/firefox/firefox ~/.local/bin/firefox
 
 firefox --version        # expect 140 or newer
 npm run test:firefox
 ```
+
+Check the ordering first with `echo $PATH | tr ':' '\n' | grep -n -E '\.local/bin|/usr/bin'`. If
+`~/.local/bin` comes later, fall back to `export PATH="$HOME/.local/opt/firefox:$PATH"` in your
+shell profile.
 
 Or skip `PATH` entirely and point Cypress at the binary for one run:
 
@@ -102,11 +113,6 @@ npx cypress run --browser ~/.local/opt/firefox/firefox
 ```
 
 </details>
-
-```bash
-nvm use          # picks up .nvmrc
-node --version   # v20.x
-```
 
 ---
 
@@ -139,6 +145,7 @@ npm test                  # full suite, headless
 | `npm run test:negative` | Only `@negative` scenarios |
 | `npm run test:chrome` | Full suite in Chrome |
 | `npm run test:firefox` | Full suite in Firefox |
+| `npm run test:edge` | Full suite in Edge |
 | `npm run test:electron` | Full suite in the bundled Electron browser |
 | `npm run test:headed` | Headed run, browser stays open afterwards |
 | `npm run test:record` | Records the run to Cypress Cloud |
@@ -443,11 +450,11 @@ missing, rather than erroring deep inside the Cypress run.
 | Cypress binary missing or corrupt | `npx cypress install --force`, then `npx cypress verify`. |
 | Browser not found | Chrome, Edge and Firefox must be installed locally. Electron always works: `npm run test:electron`. |
 | `Cypress does not support running Firefox version <140>` | Cypress 15 needs Firefox 140+ for WebDriver BiDi. Check which binary is first on `PATH` — `readlink -f $(which firefox)` — as an old build in `/opt` or `/usr/local` often shadows a newer one. |
-| Firefox: `The browser never connected` | The snap-packaged Firefox cannot be driven by Cypress at any version; snap confinement blocks access to the profile directory Cypress creates. Use a `.deb` or the [official tarball](https://www.mozilla.org/firefox/all/) instead — see below. |
+| Firefox: `The browser never connected` | The snap-packaged Firefox cannot be driven by Cypress at any version; snap confinement blocks access to the profile directory Cypress creates. Use a `.deb` or the [official tarball](https://www.mozilla.org/firefox/all/) instead — see the recipe under [Prerequisites](#prerequisites). |
 | `allowCypressEnv` warning on every run | Expected. The Cucumber preprocessor reads tags through `Cypress.env()`, so `allowCypressEnv` must stay enabled; setting it to `false` breaks tag filtering. Harmless until the preprocessor migrates to `cy.env()`. |
 | Recorded run rejected | `CYPRESS_RECORD_KEY` is unset or was rotated. Export it, or update the GitHub Actions secret. |
 | `Unknown TEST_ENV "…"` | The name is not in `config/environments.json`. Add it there, or use `CYPRESS_BASE_URL` for a one-off. |
-| Suite passes but proves nothing | Mutate the expectation and confirm it fails. See step 4 of [Writing a new test](#writing-a-new-test). |
+| Suite passes but proves nothing | Mutate the expectation and confirm it fails. See step 5 of [Writing a new test](#writing-a-new-test). |
 
 ---
 
