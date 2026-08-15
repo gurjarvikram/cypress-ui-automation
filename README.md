@@ -168,6 +168,9 @@ cypress-ui-automation/
 │       │   └── product.steps.js
 │       ├── commands.js                   # Custom commands and overrides
 │       └── e2e.js                        # Loaded before every spec
+├── config/
+│   ├── environments.json                 # baseUrl per environment — no URL in code
+│   └── resolve-environment.js            # Picks the environment, fails loudly if unknown
 ├── .cypress-cucumber-preprocessorrc.json # Step lookup, tag filtering, reporters
 ├── cypress.config.js                     # Runner configuration
 ├── .env.example                          # Documented environment variables (copy to .env)
@@ -196,13 +199,41 @@ secrets.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `CYPRESS_BASE_URL` | `https://www.saucedemo.com` | Application under test |
+| `TEST_ENV` | `production` | Which entry of `config/environments.json` to run against |
+| `CYPRESS_BASE_URL` | _(unset)_ | One-off URL override; wins over the environments file |
 | `CYPRESS_RECORD_KEY` | _(unset)_ | Cypress Cloud record key, required only for recorded runs |
+| `CYPRESS_PROJECT_ID` | `zyzyfz` | Cypress Cloud project id; override to record into a different project |
+
+### Target environment
+
+The application URL is **not** hard-coded in `cypress.config.js`. It lives in
+[`config/environments.json`](config/environments.json):
+
+```json
+{
+  "production": { "baseUrl": "https://www.saucedemo.com" }
+}
+```
+
+Add an environment by adding an entry, then select it with `TEST_ENV`:
+
+```json
+{
+  "production": { "baseUrl": "https://www.saucedemo.com" },
+  "staging":    { "baseUrl": "https://staging.example.com" }
+}
+```
 
 ```bash
-# Point the suite at another environment for one run
-CYPRESS_BASE_URL=https://staging.example.com npm test
+TEST_ENV=staging npm test                                # named environment
+CYPRESS_BASE_URL=https://pr-42.review.example.com npm test  # ad-hoc override
 ```
+
+Resolution order is `CYPRESS_BASE_URL` → the `TEST_ENV` entry → `production`. An unrecognised
+`TEST_ENV` **fails immediately** rather than falling back, because a silent fallback would run the
+whole suite against the wrong site and still report green. Every run prints its target in the
+header (`Running against "production": https://www.saucedemo.com`) and records it in Cypress Cloud
+as `testEnvironment`.
 
 ### How the record key reaches Cypress
 
@@ -374,6 +405,7 @@ missing, rather than erroring deep inside the Cypress run.
 | Cypress binary missing or corrupt | `npx cypress install --force`, then `npx cypress verify`. |
 | Browser not found in the matrix | Chrome and Firefox must be installed locally. Electron ships with Cypress: `npm run test:electron`. |
 | Recorded run rejected | `CYPRESS_RECORD_KEY` is unset or was rotated. Export it, or update the GitHub Actions secret. |
+| `Unknown TEST_ENV "…"` | The name is not in `config/environments.json`. Add it there, or use `CYPRESS_BASE_URL` for a one-off. |
 | Suite passes but proves nothing | Mutate the expectation and confirm it fails. See step 4 of [Writing a new test](#writing-a-new-test). |
 
 ---
