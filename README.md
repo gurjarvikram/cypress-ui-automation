@@ -6,9 +6,9 @@
 [![Node](https://img.shields.io/badge/Node-%3E%3D20-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
 End-to-end UI automation for the [Swag Labs](https://www.saucedemo.com) demo shop, built with
-**Cypress**, **Cucumber (Gherkin BDD)** and the **Page Object Model**. Scenarios are tag-driven,
-run across Chrome, Firefox and Electron in GitHub Actions, and publish an HTML report plus
-screenshots and video for every failure.
+**Cypress**, **Cucumber (Gherkin BDD)**, an **Object Repository** and the **Page Object Model**.
+Scenarios are tag-driven, run across Chrome, Firefox and Electron in GitHub Actions, and publish
+an HTML report plus screenshots and video for every failure.
 
 ---
 
@@ -36,7 +36,7 @@ screenshots and video for every failure.
 | Concern | Approach |
 | --- | --- |
 | Readability | Business-readable Gherkin scenarios, one feature per user-facing area |
-| Maintainability | Page Object Model — selectors live in exactly one place per page |
+| Maintainability | Object Repository + Page Object Model — a selector is defined exactly once |
 | Stability | `data-test` attribute selectors, no fixed waits, automatic retries in CI |
 | Speed | Tag-driven subsets (`@smoke` runs in seconds) and 3-way parallel cloud runs |
 | Diagnosability | Cucumber HTML report, screenshot on failure, video of every spec |
@@ -51,6 +51,7 @@ screenshots and video for every failure.
 | [@badeball/cypress-cucumber-preprocessor](https://github.com/badeball/cypress-cucumber-preprocessor) 26 | Gherkin support, tag filtering, JSON/HTML reporting |
 | [esbuild](https://esbuild.github.io/) | Bundles step definitions ahead of each spec |
 | [@faker-js/faker](https://fakerjs.dev/) 10 | Generates checkout customer data per scenario |
+| [dotenv](https://github.com/motdotla/dotenv) | Loads local `.env` values, keeping secrets out of the repo |
 | [Cypress Cloud](https://www.cypress.io/cloud) | Recorded, load-balanced parallel runs |
 | [GitHub Actions](https://docs.github.com/actions) | CI across three browsers |
 
@@ -146,6 +147,14 @@ cypress-ui-automation/
 │   ├── fixtures/
 │   │   └── users.json                    # Test data, keyed by user role
 │   └── support/
+│       ├── object-repository/            # Element locators — one file per page
+│       │   ├── common.objects.js         # Header, title, cart icon, item tile
+│       │   ├── login.objects.js
+│       │   ├── inventory.objects.js
+│       │   ├── cart.objects.js
+│       │   ├── checkout.objects.js
+│       │   ├── navigation.objects.js
+│       │   └── index.js                  # Barrel — page objects import from here
 │       ├── pages/                        # Page Object Model — one class per page
 │       │   ├── LoginPage.js
 │       │   ├── InventoryPage.js
@@ -161,20 +170,29 @@ cypress-ui-automation/
 │       └── e2e.js                        # Loaded before every spec
 ├── .cypress-cucumber-preprocessorrc.json # Step lookup, tag filtering, reporters
 ├── cypress.config.js                     # Runner configuration
-├── .env.example                          # Documented environment variables
+├── .env.example                          # Documented environment variables (copy to .env)
 └── .nvmrc                                # Node version used locally and in CI
 ```
 
-**Layering rule:** a feature file describes behaviour, a step definition translates it, and a page
-object knows the DOM. Selectors appear only in page objects; assertions about the page live in page
-objects too, so step definitions stay one line long.
+**Layering rule** — four layers, each with one job:
+
+| Layer | Knows about | Never contains |
+| --- | --- | --- |
+| `e2e/features/` | Business behaviour, in Gherkin | Selectors, code |
+| `support/step-definitions/` | Translating a sentence into a page-object call | Selectors, assertions |
+| `support/pages/` | How to act on and assert a page | Raw selector strings |
+| `support/object-repository/` | Selector strings, and nothing else | Behaviour, assertions |
+
+A selector string appears in exactly one file. When the UI changes, the fix is a one-line edit in
+the object repository, and nothing else in the suite moves.
 
 ---
 
 ## Configuration
 
-Cypress picks up any `CYPRESS_*` environment variable automatically, so nothing needs to be
-hard-coded. Copy `.env.example` to `.env` for local overrides — `.env` is git-ignored.
+No environment value is hard-coded. Copy `.env.example` to `.env` for local overrides — `.env` is
+git-ignored and is never read in CI, where GitHub Actions injects the same names from repository
+secrets.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -184,6 +202,29 @@ hard-coded. Copy `.env.example` to `.env` for local overrides — `.env` is git-
 ```bash
 # Point the suite at another environment for one run
 CYPRESS_BASE_URL=https://staging.example.com npm test
+```
+
+### How the record key reaches Cypress
+
+Two different mechanisms, because the two variables are read at different moments:
+
+- **`CYPRESS_BASE_URL`** — `cypress.config.js` calls `dotenv` at the top of the file and reads
+  `process.env.CYPRESS_BASE_URL` when building the config.
+- **`CYPRESS_RECORD_KEY`** — the Cypress CLI resolves the record key *before* it loads
+  `cypress.config.js`, so calling `dotenv` inside the config is too late and the run fails with
+  *"You passed the --record flag but did not provide us your Record Key"*. The `test:record` and
+  `test:parallel` scripts therefore preload `dotenv` into the CLI process itself:
+
+  ```jsonc
+  "test:record": "node -r dotenv/config ./node_modules/cypress/bin/cypress run --record"
+  ```
+
+Either way the key stays out of the repository. If you prefer not to keep a `.env` file, export it
+for the shell instead — the scripts work unchanged:
+
+```bash
+export CYPRESS_RECORD_KEY=<your-key>
+npm run test:record
 ```
 
 Runner defaults are set in [`cypress.config.js`](cypress.config.js):
@@ -263,17 +304,32 @@ missing, rather than erroring deep inside the Cypress run.
        Then the products should be listed in ascending order by name
    ```
 
-2. **Add the page interaction** to the relevant class in `cypress/support/pages/`, registering the
-   selector in that class's `selectors` map:
+2. **Register the selector** in the object repository, in the file for that page
+   (`cypress/support/object-repository/inventory.objects.js`):
 
    ```js
+   export const inventoryObjects = Object.freeze({
+     sortContainer: '[data-test="product-sort-container"]',
+     activeSortOption: '[data-test="active-option"]',
+
+     // Parameterised entries are plain functions.
+     addToCart: (product) => `[data-test="add-to-cart-${product}"]`,
+   });
+   ```
+
+3. **Add the page interaction** to the matching class in `cypress/support/pages/`, importing the
+   objects rather than writing a selector inline:
+
+   ```js
+   import { inventoryObjects } from '../object-repository';
+
    selectSortOption(option) {
-     cy.get(this.selectors.sortContainer).select(option);
-     cy.get(this.selectors.activeSortOption).should('have.text', option);
+     cy.get(inventoryObjects.sortContainer).select(option);
+     cy.get(inventoryObjects.activeSortOption).should('have.text', option);
    }
    ```
 
-3. **Wire the step** in `cypress/support/step-definitions/`:
+4. **Wire the step** in `cypress/support/step-definitions/`:
 
    ```js
    When('the user sorts products by {string}', (option) => {
@@ -281,16 +337,18 @@ missing, rather than erroring deep inside the Cypress run.
    });
    ```
 
-4. **Prove the test can fail.** Break the expectation on purpose, confirm a red run, then restore
+5. **Prove the test can fail.** Break the expectation on purpose, confirm a red run, then restore
    it. An assertion that has never failed has never been verified.
 
 ---
 
 ## Conventions
 
-- **Selectors** — prefer `[data-test="…"]`, which the application owns. Never select on CSS classes
-  or text that exists for styling or copy reasons. `cy.getByTestId('login-button')` is available as
-  a shorthand.
+- **Selectors** — every selector belongs in `cypress/support/object-repository/`, never inline in a
+  page object, step definition or feature. Prefer `[data-test="…"]`, which the application owns;
+  never select on CSS classes or copy text, which exist for styling and change without notice. The
+  few unavoidable exceptions (the third-party burger menu) are commented as such in
+  `navigation.objects.js`.
 - **Waiting** — never `cy.wait(<number>)`. Cypress retries assertions; assert on the state you are
   waiting for instead.
 - **Step uniqueness** — every step definition file is loaded for every feature, so step text must be
