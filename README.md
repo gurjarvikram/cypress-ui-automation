@@ -71,10 +71,37 @@ Cypress 15 drives browsers over WebDriver BiDi, which sets a floor on local brow
 | --- | --- | --- |
 | Electron | — | Bundled with Cypress; always works, used by `npm test` |
 | Chrome / Edge | Current stable | |
-| Firefox | **140** | Cypress refuses to start on older builds; see [Troubleshooting](#troubleshooting) |
+| Firefox | **140**, and **not the snap build** | See [Troubleshooting](#troubleshooting) |
 
 Only Electron is required — the browser-specific scripts are optional locally, and CI runs the
 full matrix regardless.
+
+<details>
+<summary>Installing a Cypress-compatible Firefox on Linux without root</summary>
+
+Ubuntu ships Firefox as a snap, which Cypress cannot drive. Install the official build into your
+home directory and put it first on `PATH`:
+
+```bash
+mkdir -p ~/.local/opt
+curl -L -o /tmp/firefox.tar.xz \
+  "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US"
+tar -xJf /tmp/firefox.tar.xz -C ~/.local/opt
+
+# Make it the firefox Cypress finds
+export PATH="$HOME/.local/opt/firefox:$PATH"   # add to ~/.bashrc to persist
+
+firefox --version        # expect 140 or newer
+npm run test:firefox
+```
+
+Or skip `PATH` entirely and point Cypress at the binary for one run:
+
+```bash
+npx cypress run --browser ~/.local/opt/firefox/firefox
+```
+
+</details>
 
 ```bash
 nvm use          # picks up .nvmrc
@@ -415,7 +442,8 @@ missing, rather than erroring deep inside the Cypress run.
 | `cy.visit()` failed … `404: Not Found` | Swag Labs serves only `/`; routes such as `/inventory.html` are client-side. Navigate through the UI rather than deep-linking. |
 | Cypress binary missing or corrupt | `npx cypress install --force`, then `npx cypress verify`. |
 | Browser not found | Chrome, Edge and Firefox must be installed locally. Electron always works: `npm run test:electron`. |
-| `Cypress does not support running Firefox version <140>` | Cypress 15 needs Firefox 140+ for WebDriver BiDi. Upgrade Firefox, or use `npm run test:chrome` / `test:electron` locally — CI runners carry a current build. |
+| `Cypress does not support running Firefox version <140>` | Cypress 15 needs Firefox 140+ for WebDriver BiDi. Check which binary is first on `PATH` — `readlink -f $(which firefox)` — as an old build in `/opt` or `/usr/local` often shadows a newer one. |
+| Firefox: `The browser never connected` | The snap-packaged Firefox cannot be driven by Cypress at any version; snap confinement blocks access to the profile directory Cypress creates. Use a `.deb` or the [official tarball](https://www.mozilla.org/firefox/all/) instead — see below. |
 | `allowCypressEnv` warning on every run | Expected. The Cucumber preprocessor reads tags through `Cypress.env()`, so `allowCypressEnv` must stay enabled; setting it to `false` breaks tag filtering. Harmless until the preprocessor migrates to `cy.env()`. |
 | Recorded run rejected | `CYPRESS_RECORD_KEY` is unset or was rotated. Export it, or update the GitHub Actions secret. |
 | `Unknown TEST_ENV "…"` | The name is not in `config/environments.json`. Add it there, or use `CYPRESS_BASE_URL` for a one-off. |
