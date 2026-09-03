@@ -16,8 +16,21 @@ concurrency:
 
 jobs:
   record:
-    name: Recorded run (${{ matrix.container }}/3)
+    name: Recorded run (${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
+    # Cypress Cloud refuses to parallelise machines that report different
+    # environments, and a bare ubuntu-latest reports whatever Chrome the runner
+    # image happens to ship. During a runner image rollout the three containers
+    # drew Chrome 151 and 152 and two of them were rejected with
+    # "we do not parallelize tests across different environments". Pinning the
+    # image pins the OS and the browser, so every container reports the same
+    # parameters. Bump the tag deliberately, not automatically:
+    # https://hub.docker.com/r/cypress/browsers/tags
+    container:
+      image: cypress/browsers:node-24.20.0-chrome-152.0.7977.64-1-ff-155.0-edge-152.0.4191.53-1
+      # The image's chrome sandbox needs a non-root uid, and 1001 is the uid the
+      # runner owns the mounted tool cache with.
+      options: --user 1001
     timeout-minutes: 30
     strategy:
       # Do not cancel siblings: killing a container mid-run leaves the
@@ -25,7 +38,7 @@ jobs:
       # https://github.com/cypress-io/github-action/issues/48
       fail-fast: false
       matrix:
-        container: [1, 2, 3]
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +73,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cloud-artefacts-${{ matrix.container }}
+          name: cloud-artefacts-${{ matrix.shard }}
           path: cypress/reports
           retention-days: 7
