@@ -99,7 +99,11 @@ Artefacts (screenshots, videos, cucumber JSON/HTML) all land under
   (`fail-fast: false`). Runs on push/PR to `main`.
 - `cypress-cloud.yml` — recorded 3-container parallel run on push to `main`
   and nightly at 02:00 UTC. Kept off the PR path: it burns Cloud credits and
-  the secret is unavailable to fork PRs.
+  the secret is unavailable to fork PRs. It runs inside a pinned
+  `cypress/browsers` image on purpose: Cypress Cloud rejects a parallel run
+  whose machines report different OS or browser majors, and bare
+  `ubuntu-latest` runners drift apart mid rollout. Do not drop the `container:`
+  block, and bump its tag deliberately.
 
 ## House rules
 
