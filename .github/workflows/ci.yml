@@ -37,7 +37,7 @@ jobs:
         with:
           name: smoke-artefacts
           path: cypress/reports
-          retention-days: 7
+          retention-days: 3
 
   regression:
     name: Regression (${{ matrix.browser }})
@@ -69,7 +69,7 @@ jobs:
         with:
           name: regression-artefacts-${{ matrix.browser }}
           path: cypress/reports
-          retention-days: 7
+          retention-days: 3
 
       - name: Upload Cucumber HTML report
         if: always()
@@ -77,4 +77,4 @@ jobs:
         with:
           name: cucumber-report-${{ matrix.browser }}
           path: cypress/reports/cucumber
-          retention-days: 7
+          retention-days: 3
